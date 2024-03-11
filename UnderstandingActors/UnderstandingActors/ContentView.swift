@@ -7,10 +7,10 @@
 
 import SwiftUI
 
-struct Counter {
+actor Counter {
     var value: Int = 0
     
-    mutating func increment() -> Int {
+    func increment() -> Int {
         value += 1
         return value
     }
@@ -23,8 +23,9 @@ struct ContentView: View {
                 let counter = Counter()
 
                 DispatchQueue.concurrentPerform(iterations: 100) { _ in
-                    var counter = counter
-                    print(counter.increment())
+                    Task {
+                        print(await counter.increment())
+                    }
                 }
             } label: {
                 Text("Increment")
