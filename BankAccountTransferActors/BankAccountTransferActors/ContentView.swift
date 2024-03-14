@@ -20,6 +20,10 @@ actor BankAccount {
         self.balance = balance
     }
     
+    nonisolated func getCurrentAPR() -> Double {
+        return 0.2
+    }
+    
     func deposit(_ amount: Double) {
         balance += amount
     }
@@ -42,6 +46,8 @@ struct ContentView: View {
             Button {
                 let bankAccount = BankAccount(accountNumber: 123, balance: 500)
                 let otherAccount = BankAccount(accountNumber: 456, balance: 100)
+                
+                let _ = bankAccount.getCurrentAPR() // calling nonisolated function
                 
                 DispatchQueue.concurrentPerform(iterations: 100) { _ in
                     Task {
