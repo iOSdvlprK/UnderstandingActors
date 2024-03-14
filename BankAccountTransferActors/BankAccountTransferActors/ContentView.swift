@@ -11,7 +11,7 @@ enum BankError: Error {
     case insufficientFunds(Double)
 }
 
-class BankAccount {
+actor BankAccount {
     let accountNumber: Int
     var balance: Double
     
@@ -20,15 +20,19 @@ class BankAccount {
         self.balance = balance
     }
     
-    func transfer(amount: Double, to other: BankAccount) throws {
+    func deposit(_ amount: Double) {
+        balance += amount
+    }
+    
+    func transfer(amount: Double, to other: BankAccount) async throws {
         if amount > balance {
             throw BankError.insufficientFunds(amount)
         }
         
         balance -= amount
-        other.balance += amount
+        await other.deposit(amount)
         
-        print("Current Account: \(balance), Other Account: \(other.balance)")
+        print("Current Account: \(balance), Other Account: \(await other.balance)")
     }
 }
 
@@ -40,7 +44,9 @@ struct ContentView: View {
                 let otherAccount = BankAccount(accountNumber: 456, balance: 100)
                 
                 DispatchQueue.concurrentPerform(iterations: 100) { _ in
-                    try? bankAccount.transfer(amount: 300, to: otherAccount)
+                    Task {
+                        try? await bankAccount.transfer(amount: 300, to: otherAccount)
+                    }
                 }
             } label: {
                 Text("Transfer")
