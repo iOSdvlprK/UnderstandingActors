@@ -14,19 +14,25 @@ enum NetworkError: Error {
 }
 
 class Webservice {
-    func getAllTodos(url: URL, completion: @escaping (Result<[Todo], NetworkError>) -> Void) {
+    func getAllTodos(url: URL, completion: @MainActor @escaping (Result<[Todo], NetworkError>) -> Void) {
         URLSession.shared.dataTask(with: url) { data, _, error in
             guard let data = data, error == nil else {
-                completion(.failure(.badRequest))
+                Task {
+                    await completion(.failure(.badRequest))
+                }
                 return
             }
             
             guard let todos = try? JSONDecoder().decode([Todo].self, from: data) else {
-                completion(.failure(.decodingError))
+                Task {
+                    await completion(.failure(.decodingError))
+                }
                 return
             }
             
-            completion(.success(todos))
+            Task {
+                await completion(.success(todos))
+            }
         }.resume()
     }
 }

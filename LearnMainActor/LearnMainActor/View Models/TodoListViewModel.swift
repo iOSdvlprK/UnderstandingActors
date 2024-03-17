@@ -19,9 +19,7 @@ class TodoListViewModel: ObservableObject {
             Webservice().getAllTodos(url: url) { result in
                 switch result {
                 case .success(let todos):
-                    DispatchQueue.main.async {
-                        self.todos = todos.map(TodoViewModel.init)                        
-                    }
+                    self.todos = todos.map(TodoViewModel.init)
                 case .failure(let error):
                     print(error)
                 }
