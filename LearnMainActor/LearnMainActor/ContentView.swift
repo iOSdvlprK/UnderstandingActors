@@ -15,7 +15,7 @@ struct ContentView: View {
             Text(todo.title)
         }
         .task {
-            todoListVM.populateTodos()
+            await todoListVM.populateTodos()
         }
     }
 }

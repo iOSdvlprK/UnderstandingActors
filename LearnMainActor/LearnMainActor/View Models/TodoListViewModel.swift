@@ -7,15 +7,20 @@
 
 import Foundation
 
+@MainActor
 class TodoListViewModel: ObservableObject {
     @Published var todos: [TodoViewModel] = []
     
-    func populateTodos() {
+    func populateTodos() async {
         do {
             guard let url = URL(string: "https://jsonplaceholder.typicode.com/todos") else {
                 throw NetworkError.badUrl
             }
             
+            let todos = try await Webservice().getAllTodos(url: url)
+            self.todos = todos.map(TodoViewModel.init)
+            
+            /*
             Webservice().getAllTodos(url: url) { result in
                 switch result {
                 case .success(let todos):
@@ -23,7 +28,7 @@ class TodoListViewModel: ObservableObject {
                 case .failure(let error):
                     print(error)
                 }
-            }
+            } */
         } catch {
             print(error)
         }
